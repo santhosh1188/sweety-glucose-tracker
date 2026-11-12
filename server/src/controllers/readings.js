@@ -31,14 +31,36 @@ exports.create = async (req, res, next) => {
   }
 };
 
+// exports.list = async (req, res, next) => {
+//   try {
+//     const { rows } = await pool.query(
+//       `SELECT ${COLUMNS} FROM readings WHERE user_id = $1
+//        ORDER BY reading_date DESC, id DESC`,
+//       [req.user.id]
+//     );
+//     res.json(rows);
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+
 exports.list = async (req, res, next) => {
   try {
-    const { rows } = await pool.query(
-      `SELECT ${COLUMNS} FROM readings WHERE user_id = $1
-       ORDER BY reading_date DESC, id DESC`,
-      [req.user.id]
-    );
-    res.json(rows);
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 20, 1), 100);
+    const offset = (page - 1) * limit;
+
+    const [data, count] = await Promise.all([
+      pool.query(
+        `SELECT ${COLUMNS} FROM readings WHERE user_id = $1
+         ORDER BY reading_date DESC, id DESC LIMIT $2 OFFSET $3`,
+        [req.user.id, limit, offset]
+      ),
+      pool.query('SELECT COUNT(*)::int AS total FROM readings WHERE user_id = $1', [req.user.id]),
+    ]);
+
+    const total = count.rows[0].total;
+    res.json({ data: data.rows, page, limit, total, totalPages: Math.ceil(total / limit) });
   } catch (err) {
     next(err);
   }

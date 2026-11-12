@@ -1,6 +1,8 @@
 const AppError = require('../utils/AppError');
 const { todayString, isValidDateString } = require('../utils/dates');
 
+// const SLOT_ORDER = Object.keys(SLOT_LABELS);
+// module.exports = { validateReadingInput, duplicateSlotMessage, SLOT_LABELS, SLOT_ORDER, MAX_READINGS_PER_DAY };
 const SLOT_LABELS = {
   morning_fasting: 'Morning (fasting)',
   after_breakfast: 'After breakfast',
@@ -28,4 +30,7 @@ function validateReadingInput({ date, slot, value }) {
 const duplicateSlotMessage = (slot) =>
   `You already have ${article(SLOT_LABELS[slot])} ${SLOT_LABELS[slot]} reading for this date.`;
 
-module.exports = { validateReadingInput, duplicateSlotMessage, SLOT_LABELS, MAX_READINGS_PER_DAY };
+const SLOT_ORDER = Object.keys(SLOT_LABELS);
+module.exports = { validateReadingInput, duplicateSlotMessage, SLOT_LABELS, SLOT_ORDER, MAX_READINGS_PER_DAY };
+
+//module.exports = { validateReadingInput, duplicateSlotMessage, SLOT_LABELS, MAX_READINGS_PER_DAY };
